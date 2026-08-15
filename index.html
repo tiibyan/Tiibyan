@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>تطبيق تبيــان</title>
-    <!-- استدعاء خطوط القاهرة، Amiri Quran للمصحف، وعارف رقعة للعنوان الأندلسي -->
     <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Aref+Ruqaa:wght@700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -63,7 +62,6 @@
             z-index: 100;
         }
 
-        /* تنسيق اسم التطبيق الأندلسي */
         .header-title { 
             font-family: 'Aref Ruqaa', serif;
             font-weight: 700; 
@@ -120,9 +118,10 @@
 
         .menu-list { list-style: none; }
         .menu-item { padding: 12px 10px; border-bottom: 1px solid var(--border-color); cursor: pointer; font-weight: 600; }
-        .sub-menu { list-style: none; padding-right: 15px; display: none; }
+        .sub-menu { list-style: none; padding-right: 15px; display: none; max-height: 250px; overflow-y: auto; }
         .sub-menu.open { display: block; }
-        .sub-menu li { padding: 8px 0; font-weight: normal; font-size: 14px; cursor: pointer; }
+        .sub-menu li { padding: 8px 0; font-weight: normal; font-size: 14px; cursor: pointer; border-bottom: 1px dashed var(--border-color); }
+        .sub-menu li:last-child { border-bottom: none; }
 
         .setting-section-title {
             font-weight: bold;
@@ -397,6 +396,19 @@
         <ul class="menu-list">
             <li class="menu-item" onclick="showSection('quran')">📖 المصحف الشريف</li>
             
+            <!-- فهرس السور والأجزاء -->
+            <li class="menu-item" onclick="toggleSubMenu('surahIndexMenu')">📑 فهرس السور ▾
+                <ul class="sub-menu" id="surahIndexMenu">
+                    <div id="surahsList">جاري التحميل...</div>
+                </ul>
+            </li>
+
+            <li class="menu-item" onclick="toggleSubMenu('juzIndexMenu')">📖 فهرس الأجزاء ▾
+                <ul class="sub-menu" id="juzIndexMenu">
+                    <div id="juzList">جاري التحميل...</div>
+                </ul>
+            </li>
+
             <li class="menu-item" onclick="toggleSubMenu('adhkarMenu')">🤲 أذكاري ▾
                 <ul class="sub-menu" id="adhkarMenu">
                     <li onclick="loadAdhkarCategory('morning')">أذكار الصباح</li>
@@ -424,7 +436,6 @@
             <li class="menu-item" onclick="toggleSubMenu('settingsMenu')">⚙️ الإعدادات ▾
                 <ul class="sub-menu" id="settingsMenu">
                     
-                    <!-- القارئ المفضل -->
                     <div class="setting-section-title">القارئ المفضل</div>
                     <div class="option-grid-single">
                         <div class="option-card" id="reciter-ar.yasserdosssre" onclick="selectReciter('ar.yasserdosssre')">
@@ -437,10 +448,8 @@
                             <span>ماهر المعيقلي</span><span class="checkmark">✓</span>
                         </div>
                     </div>
-                    <!-- النص التوضيحي المعدل -->
                     <div class="setting-note">💡 اضغط مرتين متتاليتين على الآية للاستماع إليها.</div>
 
-                    <!-- المظهر -->
                     <div class="setting-section-title">المظهر</div>
                     <div class="option-grid">
                         <div class="option-card" id="theme-light" onclick="selectTheme('light')">
@@ -451,7 +460,6 @@
                         </div>
                     </div>
 
-                    <!-- حجم خط الأذكار -->
                     <div class="setting-section-title">خط الأذكار</div>
                     <div class="option-grid">
                         <div class="option-card" id="font-16px" onclick="selectAdhkarFont('16px')">
@@ -468,7 +476,6 @@
                         </div>
                     </div>
 
-                    <!-- نظام الوقت -->
                     <div class="setting-section-title">نظام الوقت</div>
                     <div class="option-grid">
                         <div class="option-card" id="time-12" onclick="selectTimeFormat('12')">
@@ -543,24 +550,19 @@
     <audio id="audioPlayer" style="display:none;"></audio>
 
     <script>
+        // بداية كل جزء بالصفحات
+        const juzPages = [1, 22, 42, 62, 82, 102, 122, 142, 162, 182, 202, 222, 242, 262, 282, 302, 322, 342, 362, 382, 402, 422, 442, 462, 482, 502, 522, 542, 562, 582];
+
         const allAdhkar = {
             morning: [
                 { text: "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ: {اللَّهُ لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ...}", count: 1 },
                 { text: "قِرَاءَةُ سُورَةِ الإِخْلَاصِ وَالْفَلَقِ وَالنَّاسِ", count: 3 },
                 { text: "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ...", count: 1 }
             ],
-            evening: [
-                { text: "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ...", count: 1 }
-            ],
-            sleep: [
-                { text: "بِاسْمِكَ رَبِّي وَضَعْتُ جَنْبِي، وَبِكَ أَرْفَعُهُ...", count: 1 }
-            ],
-            wake: [
-                { text: "الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ.", count: 1 }
-            ],
-            travel: [
-                { text: "سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ.", count: 1 }
-            ],
+            evening: [{ text: "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ...", count: 1 }],
+            sleep: [{ text: "بِاسْمِكَ رَبِّي وَضَعْتُ جَنْبِي، وَبِكَ أَرْفَعُهُ...", count: 1 }],
+            wake: [{ text: "الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ.", count: 1 }],
+            travel: [{ text: "سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ.", count: 1 }],
             istighfar: [{ text: "أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ", count: 100 }],
             praise: [{ text: "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ", count: 33 }],
             tehleel: [{ text: "لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ...", count: 100 }],
@@ -577,7 +579,6 @@
         
         const audioPlayer = document.getElementById('audioPlayer');
         let currentPlayingSpan = null;
-        let lastTapTime = 0;
 
         function cleanSurahName(name) {
             if (!name) return "";
@@ -591,6 +592,51 @@
         }
 
         function toggleSubMenu(id) { document.getElementById(id).classList.toggle('open'); }
+
+        /* جلب وتسجيل فهرس السور والأجزاء */
+        async function loadQuranIndexes() {
+            try {
+                // الفهرس للسور
+                const res = await fetch('https://api.alquran.cloud/v1/surah');
+                const data = await res.json();
+                
+                let surahsHTML = '';
+                data.data.forEach(surah => {
+                    let cleaned = cleanSurahName(surah.name);
+                    surahsHTML += `<li onclick="goToSurahStart(${surah.number})">${surah.number}. سورة ${cleaned}</li>`;
+                });
+                document.getElementById('surahsList').innerHTML = surahsHTML;
+
+                // الفهرس للأجزاء
+                let juzHTML = '';
+                for (let i = 1; i <= 30; i++) {
+                    juzHTML += `<li onclick="goToJuzPage(${i})">الجزء ${i} (ص ${juzPages[i-1]})</li>`;
+                }
+                document.getElementById('juzList').innerHTML = juzHTML;
+
+            } catch (err) {
+                document.getElementById('surahsList').innerText = "تعذر تحميل الفهرس";
+                document.getElementById('juzList').innerText = "تعذر تحميل الفهرس";
+            }
+        }
+
+        async function goToSurahStart(surahNumber) {
+            try {
+                const res = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}`);
+                const data = await res.json();
+                let firstAyahPage = data.data.ayahs[0].page;
+                showSection('quran');
+                loadPage(firstAyahPage);
+            } catch (err) {
+                alert("حدث خطأ أثناء الانتقال للسورة.");
+            }
+        }
+
+        function goToJuzPage(juzNum) {
+            let targetPage = juzPages[juzNum - 1];
+            showSection('quran');
+            loadPage(targetPage);
+        }
 
         async function loadPage(p) {
             stopAudio();
@@ -637,7 +683,6 @@
             }
         }
 
-        /* تفعيل ميزة الضغط المزدوج */
         function attachDoubleTapEvents() {
             const spans = document.querySelectorAll('.ayah-span');
             spans.forEach(span => {
@@ -647,13 +692,11 @@
                 span.addEventListener('click', (e) => {
                     tapCount++;
                     if (tapCount === 1) {
-                        tapTimer = setTimeout(() => {
-                            tapCount = 0;
-                        }, 300); // المهلة الزمنية بين الضغطتين
+                        tapTimer = setTimeout(() => { tapCount = 0; }, 300);
                     } else if (tapCount === 2) {
                         clearTimeout(tapTimer);
                         tapCount = 0;
-                        playAyahAudio(span); // تشغيل الصوت عند الضغط المزدوج
+                        playAyahAudio(span);
                     }
                 });
             });
@@ -676,15 +719,11 @@
             audioPlayer.src = audioUrl;
             audioPlayer.play();
 
-            audioPlayer.onended = () => {
-                stopAudio();
-            };
+            audioPlayer.onended = () => { stopAudio(); };
         }
 
         function stopAudio() {
-            if (!audioPlayer.paused) {
-                audioPlayer.pause();
-            }
+            if (!audioPlayer.paused) { audioPlayer.pause(); }
             if (currentPlayingSpan) {
                 currentPlayingSpan.classList.remove('playing');
                 currentPlayingSpan = null;
@@ -879,6 +918,7 @@
             const savedTimeFormat = localStorage.getItem('time_format') || '12';
             selectTimeFormat(savedTimeFormat);
 
+            loadQuranIndexes();
             loadPage(currentPage);
         };
 
