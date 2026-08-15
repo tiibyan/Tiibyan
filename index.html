@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>تطبيق تبيــان</title>
-    <!-- خط Noto Naskh Arabic المخصص للقرآن الكريم والتوافق التام مع التشكيل -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600;700&family=Aref+Ruqaa:wght@700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- استدعاء خط Amiri المخصص للنصوص المشكولة والقرآن الشريف -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Aref+Ruqaa:wght@700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-color: #fcf8f2;
@@ -16,7 +16,7 @@
             --border-color: #e0e0e0;
             --gold-accent: #c5a059;
             --highlight-bg: rgba(197, 160, 89, 0.25);
-            --quran-font-size: 22px;
+            --quran-font-size: 24px;
             --adhkar-font-size: 18px;
         }
 
@@ -122,11 +122,43 @@
         .sub-menu.open { display: block; }
         .sub-menu li { 
             padding: 10px 0; 
-            font-family: 'Noto Naskh Arabic', serif; 
-            font-size: 15px; 
+            font-family: 'Amiri', serif; 
+            font-size: 16px; 
             cursor: pointer; 
             border-bottom: 1px dashed var(--border-color); 
         }
+
+        .setting-section-title {
+            font-weight: bold;
+            font-size: 14px;
+            margin: 12px 0 6px 0;
+            color: var(--gold-accent);
+        }
+
+        .option-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+        .option-grid-single { display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 6px; }
+
+        .option-card {
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-color);
+            padding: 8px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .option-card.selected {
+            border-color: var(--accent-color);
+            background-color: var(--header-bg);
+            font-weight: bold;
+        }
+
+        .option-card .checkmark { display: none; color: var(--accent-color); font-weight: bold; }
+        .option-card.selected .checkmark { display: inline; }
 
         .main-container {
             width: 100vw;
@@ -149,40 +181,44 @@
             position: relative;
         }
 
-        /* --- تصميم الإطار المزدوج (فردي وزوجي) --- */
+        /* --- تصميم الإطار المزدوج للصفحات الفردية والزوجية --- */
         .quran-frame {
             width: 100%;
             max-width: 800px;
             height: calc(100vh - 120px);
-            border: 5px double var(--gold-accent);
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
             background-color: var(--card-bg);
             position: relative;
             overflow: hidden;
-            transition: padding 0.2s ease, border-color 0.2s ease;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
 
-        /* الصفحة الفردية (اليسرى من المصحف) */
+        /* الصفحة الفردية */
         .quran-frame.odd-page {
-            padding: 8px 18px 8px 8px;
-            border-right: 8px solid var(--gold-accent);
-            border-left: 3px double var(--gold-accent);
+            border-right: 12px solid var(--gold-accent);
+            border-left: 2px solid var(--border-color);
+            border-top: 4px double var(--gold-accent);
+            border-bottom: 4px double var(--gold-accent);
+            padding: 10px 20px 10px 10px;
+            border-radius: 4px 12px 12px 4px;
         }
 
-        /* الصفحة الزوجية (اليمنى من المصحف) */
+        /* الصفحة الزوجية */
         .quran-frame.even-page {
-            padding: 8px 8px 8px 18px;
-            border-left: 8px solid var(--gold-accent);
-            border-right: 3px double var(--gold-accent);
+            border-left: 12px solid var(--gold-accent);
+            border-right: 2px solid var(--border-color);
+            border-top: 4px double var(--gold-accent);
+            border-bottom: 4px double var(--gold-accent);
+            padding: 10px 10px 10px 20px;
+            border-radius: 12px 4px 4px 12px;
         }
 
         .quran-page {
-            font-family: 'Noto Naskh Arabic', serif;
+            font-family: 'Amiri', serif;
             font-size: var(--quran-font-size);
-            line-height: 2.2;
+            line-height: 2.3;
             text-align: justify;
             text-justify: inter-word;
             width: 100%;
@@ -190,6 +226,7 @@
             overflow: hidden;
             color: var(--text-color);
             direction: rtl;
+            font-variant-ligatures: normal;
         }
 
         .ayah-span {
@@ -198,6 +235,7 @@
             transition: background-color 0.2s ease, color 0.2s ease;
             user-select: none;
             padding: 0 2px;
+            display: inline;
         }
 
         .ayah-span.playing {
@@ -212,24 +250,22 @@
             background-color: var(--bg-color);
             text-align: center;
             padding: 4px;
-            margin: 6px 0;
+            margin: 8px 0;
             border-radius: 6px;
             font-weight: bold;
-            font-size: 0.9em;
+            font-size: 0.85em;
             color: var(--accent-color);
         }
 
         .andalusian-bookmark {
             font-size: 26px;
-            color: #000000;
+            color: var(--text-color);
             cursor: pointer;
             transition: color 0.3s, transform 0.2s;
             user-select: none;
             vertical-align: middle;
             margin-right: 6px;
         }
-
-        [data-theme="dark"] .andalusian-bookmark { color: #ffffff; }
 
         .andalusian-bookmark.active {
             color: var(--gold-accent) !important;
@@ -297,16 +333,34 @@
         }
 
         .dhikr-text { 
-            font-family: 'Noto Naskh Arabic', serif; 
+            font-family: 'Amiri', serif; 
             font-size: var(--adhkar-font-size); 
-            line-height: 2; 
+            line-height: 2.1; 
             margin-bottom: 10px; 
             text-align: justify;
             color: var(--text-color);
         }
         
         .dhikr-count { display: inline-block; background-color: var(--accent-color); color: white; padding: 4px 12px; border-radius: 15px; font-size: 13px; }
+        
+        .counter-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            width: 85px;
+            height: 85px;
+            border-radius: 50%;
+            font-size: 32px;
+            margin: 15px auto;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
 
+        .counter-btn:active { transform: scale(0.95); }
+        .prayer-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color); font-size: 16px; }
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: none; z-index: 150; }
         .overlay.active { display: block; }
     </style>
@@ -331,16 +385,89 @@
 
         <ul class="menu-list">
             <li class="menu-item" onclick="showSection('quran')">📖 المصحف الشريف</li>
+            
             <li class="menu-item" onclick="toggleSubMenu('surahIndexMenu')">📑 فهرس السور ▾
                 <ul class="sub-menu" id="surahIndexMenu"><div id="surahsList">جاري التحميل...</div></ul>
             </li>
+
             <li class="menu-item" onclick="toggleSubMenu('juzIndexMenu')">📖 فهرس الأجزاء ▾
                 <ul class="sub-menu" id="juzIndexMenu"><div id="juzList">جاري التحميل...</div></ul>
             </li>
+
             <li class="menu-item" onclick="toggleSubMenu('adhkarMenu')">🤲 أذكاري ▾
                 <ul class="sub-menu" id="adhkarMenu">
                     <li onclick="loadAdhkarCategory('morning')">أذكار الصباح</li>
                     <li onclick="loadAdhkarCategory('evening')">أذكار المساء</li>
+                    <li onclick="loadAdhkarCategory('sleep')">أذكار النوم</li>
+                    <li onclick="loadAdhkarCategory('wake')">أذكار الاستيقاظ</li>
+                    <li onclick="loadAdhkarCategory('travel')">أذكار السفر</li>
+                </ul>
+            </li>
+
+            <li class="menu-item" onclick="toggleSubMenu('azkarGeneralMenu')">📿 أذكار ▾
+                <ul class="sub-menu" id="azkarGeneralMenu">
+                    <li onclick="loadAdhkarCategory('istighfar')">أستغفر الله</li>
+                    <li onclick="loadAdhkarCategory('praise')">الحمد لله</li>
+                    <li onclick="loadAdhkarCategory('tehleel')">لا إله إلا الله</li>
+                    <li onclick="loadAdhkarCategory('hawqala')">لا حول ولا قوة إلا بالله</li>
+                    <li onclick="loadAdhkarCategory('tasbeeh')">سبحان الله</li>
+                    <li onclick="loadAdhkarCategory('takbeer')">الله أكبر</li>
+                </ul>
+            </li>
+
+            <li class="menu-item" onclick="showSection('tasbeeh')">📿 المسبحة الإلكترونية</li>
+            <li class="menu-item" onclick="showSection('prayers')">🕌 مواقيت الصلاة</li>
+
+            <li class="menu-item" onclick="toggleSubMenu('settingsMenu')">⚙️ الإعدادات ▾
+                <ul class="sub-menu" id="settingsMenu">
+                    <div class="setting-section-title">القارئ المفضل</div>
+                    <div class="option-grid-single">
+                        <div class="option-card" id="reciter-ar.yasserdosssre" onclick="selectReciter('ar.yasserdosssre')">
+                            <span>ياسر الدوسري</span><span class="checkmark">✓</span>
+                        </div>
+                        <div class="option-card" id="reciter-ar.ayyoub" onclick="selectReciter('ar.ayyoub')">
+                            <span>محمد أيوب</span><span class="checkmark">✓</span>
+                        </div>
+                        <div class="option-card" id="reciter-ar.mahermuaiqly" onclick="selectReciter('ar.mahermuaiqly')">
+                            <span>ماهر المعيقلي</span><span class="checkmark">✓</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-section-title">المظهر</div>
+                    <div class="option-grid">
+                        <div class="option-card" id="theme-light" onclick="selectTheme('light')">
+                            <span>فاتح</span><span class="checkmark">✓</span>
+                        </div>
+                        <div class="option-card" id="theme-dark" onclick="selectTheme('dark')">
+                            <span>داكن</span><span class="checkmark">✓</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-section-title">خط الأذكار</div>
+                    <div class="option-grid">
+                        <div class="option-card" id="font-16px" onclick="selectAdhkarFont('16px')">
+                            <span>صغير</span><span class="checkmark">✓</span>
+                        </div>
+                        <div class="option-card" id="font-18px" onclick="selectAdhkarFont('18px')">
+                            <span>متوسط</span><span class="checkmark">✓</span>
+                        </div>
+                        <div class="option-card" id="font-22px" onclick="selectAdhkarFont('22px')">
+                            <span>كبير</span><span class="checkmark">✓</span>
+                        </div>
+                        <div class="option-card" id="font-26px" onclick="selectAdhkarFont('26px')">
+                            <span>ضخم</span><span class="checkmark">✓</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-section-title">نظام الوقت</div>
+                    <div class="option-grid">
+                        <div class="option-card" id="time-12" onclick="selectTimeFormat('12')">
+                            <span>12 ساعة</span><span class="checkmark">✓</span>
+                        </div>
+                        <div class="option-card" id="time-24" onclick="selectTimeFormat('24')">
+                            <span>24 ساعة</span><span class="checkmark">✓</span>
+                        </div>
+                    </div>
                 </ul>
             </li>
         </ul>
@@ -348,7 +475,6 @@
 
     <div class="main-container" id="mainContainer">
         <div id="quranSection" class="quran-wrapper">
-            <!-- الإطار يتحول تلقائياً من فردي لزوجي بواسطة JavaScript -->
             <div class="quran-frame odd-page" id="quranFrame">
                 <div class="quran-page" id="quranText">جاري التحميل...</div>
             </div>
@@ -374,15 +500,61 @@
             <h2 id="adhkarTitle" style="margin-bottom: 15px; text-align:center;">الأذكار</h2>
             <div id="adhkarContent"></div>
         </div>
+
+        <div id="tasbeehSection" class="content-section">
+            <h2 style="margin-bottom: 15px; text-align:center;">المسبحة الإلكترونية</h2>
+            <div class="tasbeeh-card">
+                <label style="font-weight:bold; font-size:16px; display:block; margin-bottom:8px;">اختر الذكر:</label>
+                <select id="tasbeehSelect" style="width:100%; font-size:16px; padding:8px; text-align:center; border-radius:8px;" onchange="resetTasbeehCounter()">
+                    <option value="أستغفر الله">أستغفر الله</option>
+                    <option value="الحمد لله">الحمد لله</option>
+                    <option value="لا إله إلا الله">لا إله إلا الله</option>
+                    <option value="لا حول ولا قوة إلا بالله">لا حول ولا قوة إلا بالله</option>
+                    <option value="سبحان الله">سبحان الله</option>
+                    <option value="الله أكبر">الله أكبر</option>
+                    <option value="اللهم صلِّ وسلم على نبينا محمد">اللهم صلِّ وسلم على نبينا محمد</option>
+                </select>
+
+                <div id="tasbeehDisplayCount" style="font-size: 42px; font-weight:bold; margin: 15px 0; color:var(--accent-color);">0</div>
+                <button class="counter-btn" onclick="incrementTasbeeh()">+</button>
+                <button style="background:none; border:none; color:gray; cursor:pointer; font-size:14px; margin-top:5px;" onclick="resetTasbeehCounter()">تصفير العداد 🔄</button>
+            </div>
+        </div>
+
+        <div id="prayersSection" class="content-section">
+            <h2 style="margin-bottom: 15px; text-align:center;">مواقيت الصلاة</h2>
+            <div class="prayer-card" id="prayersContainer">جاري جلب المواقيت...</div>
+        </div>
     </div>
 
     <audio id="audioPlayer" style="display:none;"></audio>
 
     <script>
         const juzPages = [1, 22, 42, 62, 82, 102, 122, 142, 162, 182, 202, 222, 242, 262, 282, 302, 322, 342, 362, 382, 402, 422, 442, 462, 482, 502, 522, 542, 562, 582];
+
+        const allAdhkar = {
+            morning: [
+                { text: "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ: {اللَّهُ لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ...}", count: 1 },
+                { text: "قِرَاءَةُ سُورَةِ الإِخْلَاصِ وَالْفَلَقِ وَالنَّاسِ", count: 3 },
+                { text: "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ...", count: 1 }
+            ],
+            evening: [{ text: "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ...", count: 1 }],
+            sleep: [{ text: "بِاسْمِكَ رَبِّي وَضَعْتُ جَنْبِي، وَبِكَ أَرْفَعُهُ...", count: 1 }],
+            wake: [{ text: "الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ.", count: 1 }],
+            travel: [{ text: "سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ.", count: 1 }],
+            istighfar: [{ text: "أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ", count: 100 }],
+            praise: [{ text: "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ", count: 33 }],
+            tehleel: [{ text: "لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ...", count: 100 }],
+            hawqala: [{ text: "لاَ حَوْلَ وَلاَ قُوَّةَ إِلاَّ بِاللَّهِ", count: 100 }],
+            tasbeeh: [{ text: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ ، سُبْحَانَ اللَّهِ الْعَظِيمِ", count: 100 }],
+            takbeer: [{ text: "اللَّهُ أَكْبَرُ كَبِيرًا", count: 33 }]
+        };
+
         let currentPage = parseInt(localStorage.getItem('saved_page')) || 1;
         let bookmarkedPage = parseInt(localStorage.getItem('bookmarked_page')) || 0;
+        let timeFormat = localStorage.getItem('time_format') || '12';
         let selectedReciter = localStorage.getItem('selected_reciter') || 'ar.yasserdosssre';
+        let tasbeehCount = 0;
         
         const audioPlayer = document.getElementById('audioPlayer');
         let currentPlayingSpan = null;
@@ -399,12 +571,49 @@
 
         function toggleSubMenu(id) { document.getElementById(id).classList.toggle('open'); }
 
+        async function loadQuranIndexes() {
+            try {
+                const res = await fetch('https://api.alquran.cloud/v1/surah');
+                const data = await res.json();
+                
+                let surahsHTML = '';
+                data.data.forEach(surah => {
+                    let cleaned = cleanSurahName(surah.name);
+                    surahsHTML += `<li onclick="goToSurahStart(${surah.number})">${surah.number}. سورة ${cleaned}</li>`;
+                });
+                document.getElementById('surahsList').innerHTML = surahsHTML;
+
+                let juzHTML = '';
+                for (let i = 1; i <= 30; i++) {
+                    juzHTML += `<li onclick="goToJuzPage(${i})">الجزء ${i} (ص ${juzPages[i-1]})</li>`;
+                }
+                document.getElementById('juzList').innerHTML = juzHTML;
+
+            } catch (err) {
+                document.getElementById('surahsList').innerText = "تعذر تحميل الفهرس";
+            }
+        }
+
+        async function goToSurahStart(surahNumber) {
+            try {
+                const res = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}`);
+                const data = await res.json();
+                showSection('quran');
+                loadPage(data.data.ayahs[0].page);
+            } catch (err) { alert("حدث خطأ أثناء الانتقال للسورة."); }
+        }
+
+        function goToJuzPage(juzNum) {
+            showSection('quran');
+            loadPage(juzPages[juzNum - 1]);
+        }
+
         async function loadPage(p) {
             stopAudio();
             p = Math.max(1, Math.min(604, p));
             currentPage = p;
-            
-            // تطبيق اتجاه الإطار حسب الصفحة (فردية أو زوجية)
+
+            // تغيير إطار الصفحة تلقائياً حسب الفردي والزوجي
             const frame = document.getElementById('quranFrame');
             if (p % 2 === 0) {
                 frame.classList.remove('odd-page');
@@ -431,10 +640,13 @@
                         surahNames.push(cleanedName);
                         pageContent += `<div class="surah-banner">سورة ${cleanedName}</div>`;
                     }
-                    
                     let audioUrl = a.audio || "";
                     pageContent += `<span class="ayah-span" data-audio="${audioUrl}" onclick="playAyahAudio(this)">${a.text} ﴿${a.numberInSurah}﴾ </span>`;
                 });
+
+                if (surahNames.length === 0) {
+                    surahNames.push(cleanSurahName(data.data.ayahs[0].surah.name));
+                }
 
                 document.getElementById('quranText').innerHTML = pageContent;
                 document.getElementById('footerSurahName').innerText = surahNames.join(' - ');
@@ -448,6 +660,7 @@
             }
         }
 
+        /* الاستماع بنقرة واحدة فقط */
         function playAyahAudio(span) {
             const audioUrl = span.getAttribute('data-audio');
             if (!audioUrl) return;
@@ -458,6 +671,7 @@
             }
 
             stopAudio();
+
             currentPlayingSpan = span;
             currentPlayingSpan.classList.add('playing');
 
@@ -530,9 +744,126 @@
             } else { 
                 document.getElementById(id + 'Section').style.display = 'block'; 
             }
+            if(id === 'prayers') fetchPrayerTimes();
+            if(document.getElementById('sidebar').classList.contains('open')) toggleSidebar();
         }
 
-        window.onload = () => { loadPage(currentPage); };
+        function loadAdhkarCategory(catKey) {
+            const container = document.getElementById('adhkarContent');
+            container.innerHTML = '';
+            (allAdhkar[catKey] || []).forEach(item => {
+                container.innerHTML += `
+                    <div class="dhikr-card">
+                        <div class="dhikr-text">${item.text}</div>
+                        <span class="dhikr-count">التكرار: ${item.count}</span>
+                    </div>`;
+            });
+            showSection('adhkar');
+        }
+
+        function handleSearch(query) {
+            query = query.trim().toLowerCase();
+            if(!query) return;
+            const container = document.getElementById('adhkarContent');
+            container.innerHTML = `<h3 style="text-align:center; margin-bottom:12px;">نتائج البحث: "${query}"</h3>`;
+            
+            let foundCount = 0;
+            Object.keys(allAdhkar).forEach(cat => {
+                allAdhkar[cat].forEach(item => {
+                    if(item.text.toLowerCase().includes(query)) {
+                        foundCount++;
+                        container.innerHTML += `
+                            <div class="dhikr-card">
+                                <div class="dhikr-text">${item.text}</div>
+                                <span class="dhikr-count">التكرار: ${item.count}</span>
+                            </div>`;
+                    }
+                });
+            });
+
+            if(foundCount === 0) { container.innerHTML += `<div style="text-align:center; color:gray; padding:20px;">لا توجد نتائج.</div>`; }
+            showSection('adhkar');
+        }
+
+        function selectReciter(val) {
+            document.querySelectorAll('[id^="reciter-"]').forEach(el => el.classList.remove('selected'));
+            document.getElementById(`reciter-${val}`).classList.add('selected');
+            selectedReciter = val;
+            localStorage.setItem('selected_reciter', val);
+            loadPage(currentPage);
+        }
+
+        function selectTheme(val) {
+            document.querySelectorAll('[id^="theme-"]').forEach(el => el.classList.remove('selected'));
+            document.getElementById(`theme-${val}`).classList.add('selected');
+            if (val === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); } 
+            else { document.documentElement.removeAttribute('data-theme'); }
+            localStorage.setItem('app_theme', val);
+        }
+
+        function selectAdhkarFont(val) {
+            document.querySelectorAll('[id^="font-"]').forEach(el => el.classList.remove('selected'));
+            document.getElementById(`font-${val}`).classList.add('selected');
+            document.documentElement.style.setProperty('--adhkar-font-size', val);
+            localStorage.setItem('adhkar_font_size', val);
+        }
+
+        function selectTimeFormat(val) {
+            document.querySelectorAll('[id^="time-"]').forEach(el => el.classList.remove('selected'));
+            document.getElementById(`time-${val}`).classList.add('selected');
+            timeFormat = val;
+            localStorage.setItem('time_format', val);
+            fetchPrayerTimes();
+        }
+
+        function fetchPrayerTimes() {
+            const container = document.getElementById('prayersContainer');
+            navigator.geolocation.getCurrentPosition(pos => {
+                fetch(`https://api.aladhan.com/v1/timings?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&method=4`)
+                    .then(res => res.json())
+                    .then(d => {
+                        const t = d.data.timings;
+                        container.innerHTML = `
+                            <div class="prayer-row"><span>الفجر</span><span>${formatTime(t.Fajr)}</span></div>
+                            <div class="prayer-row"><span>الشروق</span><span>${formatTime(t.Sunrise)}</span></div>
+                            <div class="prayer-row"><span>الظهر</span><span>${formatTime(t.Dhuhr)}</span></div>
+                            <div class="prayer-row"><span>العصر</span><span>${formatTime(t.Asr)}</span></div>
+                            <div class="prayer-row"><span>المغرب</span><span>${formatTime(t.Maghrib)}</span></div>
+                            <div class="prayer-row"><span>العشاء</span><span>${formatTime(t.Isha)}</span></div>
+                        `;
+                    });
+            }, () => { container.innerText = "يرجى تفعيل الجي بي اس لمواقيت الصلاة."; });
+        }
+
+        function formatTime(timeStr) {
+            if (timeFormat === '24') return timeStr;
+            let [h, m] = timeStr.split(':');
+            h = parseInt(h);
+            let suff = h >= 12 ? 'م' : 'ص';
+            h = h % 12 || 12;
+            return `${h}:${m} ${suff}`;
+        }
+
+        function incrementTasbeeh() {
+            tasbeehCount++;
+            document.getElementById('tasbeehDisplayCount').innerText = tasbeehCount;
+        }
+
+        function resetTasbeehCounter() {
+            tasbeehCount = 0;
+            document.getElementById('tasbeehDisplayCount').innerText = tasbeehCount;
+        }
+
+        window.onload = () => {
+            selectReciter(localStorage.getItem('selected_reciter') || 'ar.yasserdosssre');
+            selectTheme(localStorage.getItem('app_theme') || 'light');
+            selectAdhkarFont(localStorage.getItem('adhkar_font_size') || '18px');
+            selectTimeFormat(localStorage.getItem('time_format') || '12');
+
+            loadQuranIndexes();
+            loadPage(currentPage);
+        };
+
         window.onresize = () => { adjustQuranFontSize(); };
     </script>
 </body>
