@@ -4,8 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>تطبيق تبيان</title>
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- استدعاء خط حفص العثماني الحقيقي وخط القاهرة للواجهات -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
+        @font-face {
+            font-family: 'UthmanicHafs';
+            src: url('https://cdn.jsdelivr.net/gh/mustafa0x/quran-font@master/fonts/KFGQPC%20Uthmanic%20Script%20HAFS%20Regular.otf') format('opentype');
+            font-display: swap;
+        }
+
         :root {
             --bg-color: #fcf8f2;
             --header-bg: #f3ede2;
@@ -14,7 +21,7 @@
             --accent-color: #1b4d3e;
             --border-color: #e0e0e0;
             --gold-accent: #c5a059;
-            --quran-font-size: 18px;
+            --quran-font-size: 20px;
             --adhkar-font-size: 18px;
         }
 
@@ -113,7 +120,7 @@
         .sub-menu.open { display: block; }
         .sub-menu li { padding: 8px 0; font-weight: normal; font-size: 14px; cursor: pointer; }
 
-        /* تصميم الإعدادات الجديد (مربعات مع علامة صح) */
+        /* تصميم الإعدادات بالمربعات */
         .setting-section-title {
             font-weight: bold;
             font-size: 14px;
@@ -194,9 +201,9 @@
         }
 
         .quran-page {
-            font-family: 'Amiri', serif;
+            font-family: 'UthmanicHafs', serif;
             font-size: var(--quran-font-size);
-            line-height: 1.9;
+            line-height: 2.2;
             text-align: justify;
             text-justify: inter-word;
             width: 100%;
@@ -206,25 +213,8 @@
             direction: rtl;
         }
 
-        /* تنسيق الآية القابلة للضغط */
-        .ayah-text {
-            cursor: pointer;
-            border-radius: 4px;
-            padding: 0 2px;
-            transition: background 0.2s;
-        }
-
-        .ayah-text:hover {
-            background-color: rgba(197, 160, 89, 0.2);
-        }
-
-        .ayah-text.playing {
-            background-color: rgba(27, 77, 62, 0.25);
-            color: var(--accent-color);
-            font-weight: bold;
-        }
-
         .surah-banner {
+            font-family: 'Cairo', sans-serif;
             border: 2px solid var(--accent-color);
             background-color: var(--bg-color);
             text-align: center;
@@ -232,7 +222,7 @@
             margin: 4px 0;
             border-radius: 6px;
             font-weight: bold;
-            font-size: 1em;
+            font-size: 0.9em;
             color: var(--accent-color);
         }
 
@@ -324,7 +314,7 @@
         }
 
         .dhikr-text { 
-            font-family: 'Amiri', serif; 
+            font-family: 'UthmanicHafs', serif; 
             font-size: var(--adhkar-font-size); 
             line-height: 2; 
             margin-bottom: 10px; 
@@ -412,17 +402,6 @@
                         </div>
                         <div class="option-card" id="theme-dark" onclick="selectTheme('dark')">
                             <span>داكن</span><span class="checkmark">✓</span>
-                        </div>
-                    </div>
-
-                    <!-- القارئ -->
-                    <div class="setting-section-title">القارئ المفضّل</div>
-                    <div class="option-grid">
-                        <div class="option-card" id="reciter-yasser" onclick="selectReciter('ar.yasserdussary')">
-                            <span>ياسر الدوسري</span><span class="checkmark">✓</span>
-                        </div>
-                        <div class="option-card" id="reciter-maher" onclick="selectReciter('ar.mahermuaiqly')">
-                            <span>ماهر المعيقلي</span><span class="checkmark">✓</span>
                         </div>
                     </div>
 
@@ -514,9 +493,6 @@
         </div>
     </div>
 
-    <!-- مشغل الصوت المخفي -->
-    <audio id="audioPlayer"></audio>
-
     <script>
         const allAdhkar = {
             morning: [
@@ -547,9 +523,7 @@
         let currentPage = parseInt(localStorage.getItem('saved_page')) || 1;
         let bookmarkedPage = parseInt(localStorage.getItem('bookmarked_page')) || 0;
         let timeFormat = localStorage.getItem('time_format') || '12';
-        let selectedReciter = localStorage.getItem('selected_reciter') || 'ar.yasserdussary';
         let tasbeehCount = 0;
-        const audioPlayer = document.getElementById('audioPlayer');
 
         function cleanSurahName(name) {
             if (!name) return "";
@@ -584,8 +558,7 @@
                         surahNames.push(cleanedName);
                         pageContent += `<div class="surah-banner">سورة ${cleanedName}</div>`;
                     }
-                    // إضافة الخاصية والنقر لتلاوة الآية
-                    pageContent += `<span class="ayah-text" onclick="playAyah(${a.number}, this)">${a.text} ﴿${a.numberInSurah}﴾</span> `;
+                    pageContent += `${a.text} ﴿${a.numberInSurah}﴾ `;
                 });
 
                 if (surahNames.length === 0) {
@@ -604,19 +577,6 @@
             } catch (err) {
                 document.getElementById('quranText').innerText = "تعذر تحميل الصفحة. يرجى التأكد من الاتصال بالإنترنت.";
             }
-        }
-
-        /* تشغيل صوت الآية عند الضغط عليها */
-        function playAyah(ayahGlobalNumber, element) {
-            document.querySelectorAll('.ayah-text').forEach(el => el.classList.remove('playing'));
-            element.classList.add('playing');
-
-            audioPlayer.src = `https://cdn.islamic.network/quran/audio/128/${selectedReciter}/${ayahGlobalNumber}.mp3`;
-            audioPlayer.play();
-
-            audioPlayer.onended = () => {
-                element.classList.remove('playing');
-            };
         }
 
         function updateBookmarkState() {
@@ -649,7 +609,7 @@
             const page = document.getElementById('quranText');
             if (!frame || !page) return;
 
-            let size = 22;
+            let size = 24;
             document.documentElement.style.setProperty('--quran-font-size', size + 'px');
 
             while ((page.scrollHeight > frame.clientHeight || page.offsetHeight > frame.clientHeight) && size > 11) {
@@ -722,7 +682,6 @@
             showSection('adhkar');
         }
 
-        /* ووظائف تحديد الإعدادات وإظهار علامة الصحيح ✓ */
         function selectTheme(val) {
             document.querySelectorAll('[id^="theme-"]').forEach(el => el.classList.remove('selected'));
             document.getElementById(`theme-${val}`).classList.add('selected');
@@ -732,14 +691,6 @@
                 document.documentElement.removeAttribute('data-theme');
             }
             localStorage.setItem('app_theme', val);
-        }
-
-        function selectReciter(val) {
-            document.querySelectorAll('[id^="reciter-"]').forEach(el => el.classList.remove('selected'));
-            const reciterKey = val.includes('yasser') ? 'yasser' : 'maher';
-            document.getElementById(`reciter-${reciterKey}`).classList.add('selected');
-            selectedReciter = val;
-            localStorage.setItem('selected_reciter', val);
         }
 
         function selectAdhkarFont(val) {
@@ -798,9 +749,6 @@
         window.onload = () => {
             const savedTheme = localStorage.getItem('app_theme') || 'light';
             selectTheme(savedTheme);
-
-            const savedReciter = localStorage.getItem('selected_reciter') || 'ar.yasserdussary';
-            selectReciter(savedReciter);
 
             const savedAdhkarFont = localStorage.getItem('adhkar_font_size') || '18px';
             selectAdhkarFont(savedAdhkarFont);
