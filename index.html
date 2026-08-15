@@ -45,7 +45,6 @@
             direction: rtl;
         }
 
-        /* البنر العلوي الثابت */
         .top-header {
             position: fixed;
             top: 0;
@@ -61,11 +60,7 @@
             z-index: 100;
         }
 
-        .header-title {
-            font-weight: bold;
-            font-size: 16px;
-            color: var(--text-color);
-        }
+        .header-title { font-weight: bold; font-size: 16px; color: var(--text-color); }
 
         .menu-btn {
             background: none;
@@ -73,9 +68,6 @@
             border: none;
             font-size: 24px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .sidebar {
@@ -121,20 +113,48 @@
         .sub-menu.open { display: block; }
         .sub-menu li { padding: 8px 0; font-weight: normal; font-size: 14px; cursor: pointer; }
 
-        .setting-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
+        /* تصميم الإعدادات الجديد (مربعات مع علامة صح) */
+        .setting-section-title {
+            font-weight: bold;
             font-size: 14px;
+            margin: 12px 0 6px 0;
+            color: var(--gold-accent);
         }
 
-        .setting-select {
-            padding: 5px 8px;
-            border-radius: 5px;
+        .option-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .option-card {
             border: 1px solid var(--border-color);
-            background: var(--bg-color);
-            color: var(--text-color);
+            background-color: var(--bg-color);
+            padding: 8px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .option-card.selected {
+            border-color: var(--accent-color);
+            background-color: var(--header-bg);
+            font-weight: bold;
+        }
+
+        .option-card .checkmark {
+            display: none;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .option-card.selected .checkmark {
+            display: inline;
         }
 
         .main-container {
@@ -170,7 +190,7 @@
             box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
             background-color: var(--card-bg);
             position: relative;
-            overflow: hidden; /* تجميد التحريك العمودي تماماً */
+            overflow: hidden;
         }
 
         .quran-page {
@@ -181,9 +201,27 @@
             text-justify: inter-word;
             width: 100%;
             height: 100%;
-            overflow: hidden; /* يمنع السكرول */
+            overflow: hidden;
             color: var(--text-color);
             direction: rtl;
+        }
+
+        /* تنسيق الآية القابلة للضغط */
+        .ayah-text {
+            cursor: pointer;
+            border-radius: 4px;
+            padding: 0 2px;
+            transition: background 0.2s;
+        }
+
+        .ayah-text:hover {
+            background-color: rgba(197, 160, 89, 0.2);
+        }
+
+        .ayah-text.playing {
+            background-color: rgba(27, 77, 62, 0.25);
+            color: var(--accent-color);
+            font-weight: bold;
         }
 
         .surah-banner {
@@ -208,9 +246,7 @@
             margin-right: 6px;
         }
 
-        [data-theme="dark"] .andalusian-bookmark {
-            color: #ffffff;
-        }
+        [data-theme="dark"] .andalusian-bookmark { color: #ffffff; }
 
         .andalusian-bookmark.active {
             color: var(--gold-accent) !important;
@@ -233,19 +269,8 @@
             direction: rtl;
         }
 
-        .surah-info-box {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 13px;
-            font-weight: bold;
-        }
-
-        .page-counter-box {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
+        .surah-info-box { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: bold; }
+        .page-counter-box { display: flex; align-items: center; gap: 4px; }
 
         .page-input {
             width: 48px;
@@ -326,7 +351,6 @@
         }
 
         .counter-btn:active { transform: scale(0.95); }
-
         .prayer-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-color); font-size: 16px; }
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: none; z-index: 150; }
         .overlay.active { display: block; }
@@ -334,7 +358,6 @@
 </head>
 <body>
 
-    <!-- البنر العلوي الثابت -->
     <div class="top-header">
         <button class="menu-btn" onclick="toggleSidebar(event)">☰</button>
         <span class="header-title">تطبيق تبيان</span>
@@ -380,29 +403,57 @@
 
             <li class="menu-item" onclick="toggleSubMenu('settingsMenu')">⚙️ الإعدادات ▾
                 <ul class="sub-menu" id="settingsMenu">
-                    <li class="setting-row">
-                        <span>المظهر:</span>
-                        <select id="themeSelect" class="setting-select" onchange="changeTheme(this.value)">
-                            <option value="light">فاتح (نهاري)</option>
-                            <option value="dark">داكن (ليلي)</option>
-                        </select>
-                    </li>
-                    <li class="setting-row">
-                        <span>خط الأذكار:</span>
-                        <select id="adhkarFontSelect" class="setting-select" onchange="changeAdhkarFontSize(this.value)">
-                            <option value="16px">صغير</option>
-                            <option value="18px">متوسط</option>
-                            <option value="22px">كبير</option>
-                            <option value="26px">كبير جداً</option>
-                        </select>
-                    </li>
-                    <li class="setting-row">
-                        <span>نظام الوقت:</span>
-                        <select id="timeFormatSelect" class="setting-select" onchange="changeTimeFormat(this.value)">
-                            <option value="12">12 ساعة</option>
-                            <option value="24">24 ساعة</option>
-                        </select>
-                    </li>
+                    
+                    <!-- المظهر -->
+                    <div class="setting-section-title">المظهر</div>
+                    <div class="option-grid">
+                        <div class="option-card" id="theme-light" onclick="selectTheme('light')">
+                            <span>فاتح</span><span class="checkmark">✓</span>
+                        </div>
+                        <div class="option-card" id="theme-dark" onclick="selectTheme('dark')">
+                            <span>داكن</span><span class="checkmark">✓</span>
+                        </div>
+                    </div>
+
+                    <!-- القارئ -->
+                    <div class="setting-section-title">القارئ المفضّل</div>
+                    <div class="option-grid">
+                        <div class="option-card" id="reciter-yasser" onclick="selectReciter('ar.yasserdussary')">
+                            <span>ياسر الدوسري</span><span class="checkmark">✓</span>
+                        </div>
+                        <div class="option-card" id="reciter-maher" onclick="selectReciter('ar.mahermuaiqly')">
+                            <span>ماهر المعيقلي</span><span class="checkmark">✓</span>
+                        </div>
+                    </div>
+
+                    <!-- حجم خط الأذكار -->
+                    <div class="setting-section-title">خط الأذكار</div>
+                    <div class="option-grid">
+                        <div class="option-card" id="font-16px" onclick="selectAdhkarFont('16px')">
+                            <span>صغير</span><span class="checkmark">✓</span>
+                        </div>
+                        <div class="option-card" id="font-18px" onclick="selectAdhkarFont('18px')">
+                            <span>متوسط</span><span class="checkmark">✓</span>
+                        </div>
+                        <div class="option-card" id="font-22px" onclick="selectAdhkarFont('22px')">
+                            <span>كبير</span><span class="checkmark">✓</span>
+                        </div>
+                        <div class="option-card" id="font-26px" onclick="selectAdhkarFont('26px')">
+                            <span>ضخم</span><span class="checkmark">✓</span>
+                        </div>
+                    </div>
+
+                    <!-- نظام الوقت -->
+                    <div class="setting-section-title">نظام الوقت</div>
+                    <div class="option-grid">
+                        <div class="option-card" id="time-12" onclick="selectTimeFormat('12')">
+                            <span>12 ساعة</span><span class="checkmark">✓</span>
+                        </div>
+                        <div class="option-card" id="time-24" onclick="selectTimeFormat('24')">
+                            <span>24 ساعة</span><span class="checkmark">✓</span>
+                        </div>
+                    </div>
+
                 </ul>
             </li>
         </ul>
@@ -441,7 +492,7 @@
             <h2 style="margin-bottom: 15px; text-align:center;">المسبحة الإلكترونية</h2>
             <div class="tasbeeh-card">
                 <label style="font-weight:bold; font-size:16px; display:block; margin-bottom:8px;">اختر الذكر:</label>
-                <select id="tasbeehSelect" class="setting-select" style="width:100%; font-size:16px; padding:8px; text-align:center;" onchange="resetTasbeehCounter()">
+                <select id="tasbeehSelect" class="setting-select" style="width:100%; font-size:16px; padding:8px; text-align:center; border-radius:8px;" onchange="resetTasbeehCounter()">
                     <option value="أستغفر الله">أستغفر الله</option>
                     <option value="الحمد لله">الحمد لله</option>
                     <option value="لا إله إلا الله">لا إله إلا الله</option>
@@ -463,62 +514,42 @@
         </div>
     </div>
 
+    <!-- مشغل الصوت المخفي -->
+    <audio id="audioPlayer"></audio>
+
     <script>
         const allAdhkar = {
             morning: [
-                { text: "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ: {اللَّهُ لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ مَنْ ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلَّا بِإِذْنِهِ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ وَلَا يُحِيطُونَ بِشَيْءٍ مِنْ عِلْمِهِ إِلَّا بِمَا شَاءَ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ وَلَا يَئُودُهُ حِفْظُهُمَا وَهُوَ الْعَلِيُّ الْعَظِيمُ}", count: 1 },
-                { text: "قِرَاءَةُ سُورَةِ الإِخْلَاصِ: {قُلْ هُوَ اللَّهُ أَحَدٌ * اللَّهُ الصَّمَدُ * لَمْ يَلِدْ وَلَمْ يُولَدْ * وَلَمْ يَكُنْ لَهُ كُفُوًا أَحَدٌ}", count: 3 },
-                { text: "قِرَاءَةُ سُورَةِ الْفَلَقِ: {قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ * مِنْ شَرِّ مَا خَلَقَ * وَمِنْ شَرِّ غَاسِقٍ إِذَا وَقَبَ * وَمِنْ شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ * وَمِنْ شَرِّ حَاسِدٍ إِذَا حَسَدَ}", count: 3 },
-                { text: "قِرَاءَةُ سُورَةِ النَّاسِ: {قُلْ أَعُوذُ بِرَبِّ النَّاسِ * مَلِكِ النَّاسِ * إِلَهِ النَّاسِ * مِنْ شَرِّ الْوَسْوَاسِ الْخَنَّاسِ * الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ * مِنَ الْجِنَّةِ وَالنَّاسِ}", count: 3 },
-                { text: "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذَا الْيَوْمِ وَخَيْرَ مَا بَعْدَهُ، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذَا الْيَوْمِ وَشَرِّ مَا بَعْدَهُ، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ وَعَذَابٍ فِي الْقَبْرِ.", count: 1 },
-                { text: "اللَّهُمَّ بِكَ أَصْبَحْنَا، وَبِكَ أَمْسَيْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ وَإِلَيْكَ النُّشُورُ.", count: 1 },
-                { text: "اللَّهُمَّ أَنْتَ رَبِّي لاَ إِلَهَ إِلاَّ أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي فَإِنَّهُ لاَ يَغْفِرُ الذُّنُوبَ إِلاَّ أَنْتَ.", count: 1 },
-                { text: "اللَّهُمَّ إِنِّي أَصْبَحْتُ أُشْهِدُكَ، وَأُشْهِدُ حَمَلَةَ عَرْشِكَ، وَمَلاَئِكَتَكَ، وَجَمِيعَ خَلْقِكَ، أَنَّكَ أَنْتَ اللَّهُ لاَ إِلَهَ إِلاَّ أَنْتَ وَحْدَكَ لاَ شَرِيكَ لَهُ، وَأَنَّ مُحَمَّداً عَبْدُكَ وَرَسُولُكَ.", count: 4 },
-                { text: "اللَّهُمَّ مَا أَصْبَحَ بِي مِنْ نِعْمَةٍ أَوْ بِأَحَدٍ مِنْ خَلْقِكَ فَمِنْكَ وَحْدَكَ لاَ شَرِيكَ لَكَ، فَلَكَ الْحَمْدُ وَلَكَ الشُّكْرُ.", count: 1 },
-                { text: "اللَّهُمَّ عَافِنِي فِي بَدَنِي، اللَّهُمَّ عَافِنِي فِي سَمْعِي، اللَّهُمَّ عَافِنِي فِي بَصَرِي، لاَ إِلَهَ إِلاَّ أَنْتَ. اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْكُفْرِ، وَالْفَقْرِ، وَأَعُوذُ بِكَ مِنْ عَذَابِ الْقَبْرِ، لاَ إِلَهَ إِلاَّ أَنْتَ.", count: 3 },
-                { text: "حَسْبِيَ اللَّهُ لاَ إِلَهَ إِلاَّ هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ.", count: 7 },
-                { text: "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي الدُّنْيَا وَالآخِرَةِ، اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي دِينِي وَدُنْيَايَ وَأَهْلِي وَمَالِي، اللَّهُمَّ اسْتُرْ عَوْرَاتِي وَآمِنْ رَوْعَاتِي، اللَّهُمَّ احْفَظْنِي مِنْ بَيْنِ يَدَيَّ وَمِنْ خَلْفِي وَعَنْ يَمِينِي وَعَنْ شِمَالِي وَمِنْ فَوْقِي، وَأَعُوذُ بِعَظَمَتِكَ أَنْ أُغْتَالَ مِنْ تَحْتِي.", count: 1 },
-                { text: "اللَّهُمَّ عَالِمَ الْغَيْبِ وَالشَّهَادَةِ فَاطِرَ السَّمَوَاتِ وَالأَرْضِ، رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ، أَشْهَدُ أَنْ لاَ إِلَهَ إِلاَّ أَنْتَ، أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي، وَمِنْ شَرِّ الشَّيْطَانِ وَشِرْكِهِ، وَأَنْ أَقْتَرِفَ عَلَى نَفْسِي سُوءاً أَوْ أَجُرَّهُ إِلَى مُسْلِمٍ.", count: 1 },
-                { text: "بِسْمِ اللَّهِ الَّذِي لاَ يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الأَرْضِ وَلاَ فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ.", count: 3 },
-                { text: "رَضِيتُ بِاللَّهِ رَبّاً، وَبِالإِسْلاَمِ دِيناً، وَبِمُحَمَّدٍ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ نَبِيّاً.", count: 3 },
-                { text: "يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ أَصْلِحْ لِي شَأْنِي كُلَّهُ وَلاَ تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ.", count: 1 },
-                { text: "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ رَبِّ الْعَالَمِينَ، اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَ هَذَا الْيَوْمِ: فَتْحَهُ، وَنَصْرَهُ، وَنُورَهُ، وَبَرَكَتَهُ، وَهُدَاهُ، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِيهِ وَشَرِّ مَا بَعْدَهُ.", count: 1 },
-                { text: "أَصْبَحْنَا عَلَى فِطْرَةِ الإِسْلاَمِ، وَعَلَى كَلِمَةِ الإِخْلاَصِ، وَعَلَى دِينِ نَبِيِّنَا مُحَمَّدٍ صَلَّى اللَّهُ عَلَيْهِ وَسَلَّمَ، وَعَلَى مِلَّةِ أَبِينَا إِبْرَاهِيمَ حَنِيفاً مُسْلِماً وَمَا كَانَ مِنَ الْمُشْرِكِينَ.", count: 1 },
-                { text: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ: عَدَدَ خَلْقِهِ، وَرِضَا نَفْسِهِ، وَزِنَةَ عَرْشِهِ، وَمِدَادَ كَلِمَاتِهِ.", count: 3 },
-                { text: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ.", count: 100 },
-                { text: "لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ.", count: 10 },
-                { text: "أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ.", count: 100 },
-                { text: "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ.", count: 10 }
+                { text: "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ: {اللَّهُ لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ...}", count: 1 },
+                { text: "قِرَاءَةُ سُورَةِ الإِخْلَاصِ وَالْفَلَقِ وَالنَّاسِ", count: 3 },
+                { text: "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ...", count: 1 }
             ],
             evening: [
-                { text: "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ: {اللَّهُ لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ...}", count: 1 },
-                { text: "قِرَاءَةُ سُورَةِ الإِخْلَاصِ وَالْفَلَقِ وَالنَّاسِ", count: 3 },
-                { text: "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ...", count: 1 },
-                { text: "اللَّهُمَّ بِكَ أَمْسَيْنَا، وَبِكَ أَصْبَحْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ وَإِلَيْكَ الْمَصِيرُ.", count: 1 }
+                { text: "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ...", count: 1 }
             ],
             sleep: [
-                { text: "بِاسْمِكَ رَبِّي وَضَعْتُ جَنْبِي، وَبِكَ أَرْفَعُهُ...", count: 1 },
-                { text: "اللَّهُمَّ قِنِي عَذَابَكَ يَوْمَ تَبْعَثُ عِبَادَكَ.", count: 3 },
-                { text: "بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا.", count: 1 }
+                { text: "بِاسْمِكَ رَبِّي وَضَعْتُ جَنْبِي، وَبِكَ أَرْفَعُهُ...", count: 1 }
             ],
             wake: [
                 { text: "الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ.", count: 1 }
             ],
             travel: [
-                { text: "سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ * وَإِنَّا إِلَى رَبِّنَا لَمُنْقَلِبُونَ.", count: 1 }
+                { text: "سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ.", count: 1 }
             ],
             istighfar: [{ text: "أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ", count: 100 }],
             praise: [{ text: "الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ", count: 33 }],
-            tehleel: [{ text: "لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ", count: 100 }],
+            tehleel: [{ text: "لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ...", count: 100 }],
             hawqala: [{ text: "لاَ حَوْلَ وَلاَ قُوَّةَ إِلاَّ بِاللَّهِ", count: 100 }],
             tasbeeh: [{ text: "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ ، سُبْحَانَ اللَّهِ الْعَظِيمِ", count: 100 }],
-            takbeer: [{ text: "اللَّهُ أَكْبَرُ كَبِيرًا ، وَالْحَمْدُ لِلَّهِ كَثِيرًا", count: 33 }]
+            takbeer: [{ text: "اللَّهُ أَكْبَرُ كَبِيرًا", count: 33 }]
         };
 
         let currentPage = parseInt(localStorage.getItem('saved_page')) || 1;
         let bookmarkedPage = parseInt(localStorage.getItem('bookmarked_page')) || 0;
         let timeFormat = localStorage.getItem('time_format') || '12';
+        let selectedReciter = localStorage.getItem('selected_reciter') || 'ar.yasserdussary';
         let tasbeehCount = 0;
+        const audioPlayer = document.getElementById('audioPlayer');
 
         function cleanSurahName(name) {
             if (!name) return "";
@@ -553,10 +584,8 @@
                         surahNames.push(cleanedName);
                         pageContent += `<div class="surah-banner">سورة ${cleanedName}</div>`;
                     }
-                });
-
-                data.data.ayahs.forEach(a => {
-                    pageContent += `${a.text} ﴿${a.numberInSurah}﴾ `;
+                    // إضافة الخاصية والنقر لتلاوة الآية
+                    pageContent += `<span class="ayah-text" onclick="playAyah(${a.number}, this)">${a.text} ﴿${a.numberInSurah}﴾</span> `;
                 });
 
                 if (surahNames.length === 0) {
@@ -571,11 +600,23 @@
                 updateBookmarkState();
                 localStorage.setItem('saved_page', p);
                 
-                // ضبط حجم الخط فورياً ليناسب الصفحة بالضبط بدون سكرول
                 setTimeout(adjustQuranFontSize, 50);
             } catch (err) {
                 document.getElementById('quranText').innerText = "تعذر تحميل الصفحة. يرجى التأكد من الاتصال بالإنترنت.";
             }
+        }
+
+        /* تشغيل صوت الآية عند الضغط عليها */
+        function playAyah(ayahGlobalNumber, element) {
+            document.querySelectorAll('.ayah-text').forEach(el => el.classList.remove('playing'));
+            element.classList.add('playing');
+
+            audioPlayer.src = `https://cdn.islamic.network/quran/audio/128/${selectedReciter}/${ayahGlobalNumber}.mp3`;
+            audioPlayer.play();
+
+            audioPlayer.onended = () => {
+                element.classList.remove('playing');
+            };
         }
 
         function updateBookmarkState() {
@@ -599,11 +640,10 @@
                 showSection('quran');
                 loadPage(bookmarkedPage);
             } else {
-                alert("لم تقم بحفظ أي صفحة بعد. انقر على علامة ۞ للحفظ.");
+                alert("لم تقم بحفظ أي صفحة بعد.");
             }
         }
 
-        /* تقليص الخط تلقائيًا لعدم السماح بأي حركة عمودية */
         function adjustQuranFontSize() {
             const frame = document.querySelector('.quran-frame');
             const page = document.getElementById('quranText');
@@ -623,7 +663,6 @@
             if(val >= 1 && val <= 604) { loadPage(val); }
         }
 
-        /* التصفح بالسحب الأفقي فقط (يمين يتقدم، يسار يرجع) */
         let startX = 0;
         document.getElementById('mainContainer').addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, {passive: true});
         document.getElementById('mainContainer').addEventListener('touchend', e => {
@@ -656,16 +695,14 @@
             showSection('adhkar');
         }
 
-        /* إصلاح وظيفة البحث بالكامل */
         function handleSearch(query) {
             query = query.trim().toLowerCase();
             if(!query) return;
             
             const container = document.getElementById('adhkarContent');
-            container.innerHTML = `<h3 style="text-align:center; margin-bottom:12px;">نتائج البحث عن: "${query}"</h3>`;
+            container.innerHTML = `<h3 style="text-align:center; margin-bottom:12px;">نتائج البحث: "${query}"</h3>`;
             
             let foundCount = 0;
-            
             Object.keys(allAdhkar).forEach(cat => {
                 allAdhkar[cat].forEach(item => {
                     if(item.text.toLowerCase().includes(query)) {
@@ -680,30 +717,43 @@
             });
 
             if(foundCount === 0) {
-                container.innerHTML += `<div style="text-align:center; color:gray; padding:20px;">لم يتم العثور على أي نتائج مطابقة.</div>`;
+                container.innerHTML += `<div style="text-align:center; color:gray; padding:20px;">لا توجد نتائج مطابقة.</div>`;
             }
-            
             showSection('adhkar');
         }
 
-        /* إصلاح التحويل الفوري للألوان */
-        function changeTheme(v) {
-            if (v === 'dark') {
+        /* ووظائف تحديد الإعدادات وإظهار علامة الصحيح ✓ */
+        function selectTheme(val) {
+            document.querySelectorAll('[id^="theme-"]').forEach(el => el.classList.remove('selected'));
+            document.getElementById(`theme-${val}`).classList.add('selected');
+            if (val === 'dark') {
                 document.documentElement.setAttribute('data-theme', 'dark');
             } else {
                 document.documentElement.removeAttribute('data-theme');
             }
-            localStorage.setItem('app_theme', v);
+            localStorage.setItem('app_theme', val);
         }
 
-        function changeAdhkarFontSize(v) {
-            document.documentElement.style.setProperty('--adhkar-font-size', v);
-            localStorage.setItem('adhkar_font_size', v);
+        function selectReciter(val) {
+            document.querySelectorAll('[id^="reciter-"]').forEach(el => el.classList.remove('selected'));
+            const reciterKey = val.includes('yasser') ? 'yasser' : 'maher';
+            document.getElementById(`reciter-${reciterKey}`).classList.add('selected');
+            selectedReciter = val;
+            localStorage.setItem('selected_reciter', val);
         }
 
-        function changeTimeFormat(v) {
-            timeFormat = v;
-            localStorage.setItem('time_format', v);
+        function selectAdhkarFont(val) {
+            document.querySelectorAll('[id^="font-"]').forEach(el => el.classList.remove('selected'));
+            document.getElementById(`font-${val}`).classList.add('selected');
+            document.documentElement.style.setProperty('--adhkar-font-size', val);
+            localStorage.setItem('adhkar_font_size', val);
+        }
+
+        function selectTimeFormat(val) {
+            document.querySelectorAll('[id^="time-"]').forEach(el => el.classList.remove('selected'));
+            document.getElementById(`time-${val}`).classList.add('selected');
+            timeFormat = val;
+            localStorage.setItem('time_format', val);
             fetchPrayerTimes();
         }
 
@@ -747,16 +797,16 @@
 
         window.onload = () => {
             const savedTheme = localStorage.getItem('app_theme') || 'light';
-            document.getElementById('themeSelect').value = savedTheme;
-            changeTheme(savedTheme);
+            selectTheme(savedTheme);
+
+            const savedReciter = localStorage.getItem('selected_reciter') || 'ar.yasserdussary';
+            selectReciter(savedReciter);
 
             const savedAdhkarFont = localStorage.getItem('adhkar_font_size') || '18px';
-            document.getElementById('adhkarFontSelect').value = savedAdhkarFont;
-            changeAdhkarFontSize(savedAdhkarFont);
+            selectAdhkarFont(savedAdhkarFont);
 
             const savedTimeFormat = localStorage.getItem('time_format') || '12';
-            document.getElementById('timeFormatSelect').value = savedTimeFormat;
-            timeFormat = savedTimeFormat;
+            selectTimeFormat(savedTimeFormat);
 
             loadPage(currentPage);
         };
