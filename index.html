@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>تطبيق تبيان</title>
-    <!-- استدعاء خط حفص العثماني الحقيقي وخط القاهرة للواجهات -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>تطبيق تبيــان</title>
+    <!-- استدعاء خطوط القاهرة والعثماني وعارف رقعة للعنوان الأندلسي -->
+    <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         @font-face {
             font-family: 'UthmanicHafs';
@@ -21,6 +21,7 @@
             --accent-color: #1b4d3e;
             --border-color: #e0e0e0;
             --gold-accent: #c5a059;
+            --highlight-bg: rgba(197, 160, 89, 0.25);
             --quran-font-size: 20px;
             --adhkar-font-size: 18px;
         }
@@ -33,6 +34,7 @@
             --accent-color: #2d6a4f;
             --border-color: #333333;
             --gold-accent: #d4af37;
+            --highlight-bg: rgba(212, 175, 55, 0.3);
         }
 
         * {
@@ -67,7 +69,15 @@
             z-index: 100;
         }
 
-        .header-title { font-weight: bold; font-size: 16px; color: var(--text-color); }
+        /* تنسيق اسم التطبيق الأندلسي */
+        .header-title { 
+            font-family: 'Aref Ruqaa', serif;
+            font-weight: 700; 
+            font-size: 24px; 
+            color: var(--gold-accent);
+            letter-spacing: 1px;
+            text-shadow: 0px 1px 1px rgba(0,0,0,0.1);
+        }
 
         .menu-btn {
             background: none;
@@ -120,7 +130,6 @@
         .sub-menu.open { display: block; }
         .sub-menu li { padding: 8px 0; font-weight: normal; font-size: 14px; cursor: pointer; }
 
-        /* تصميم الإعدادات بالمربعات */
         .setting-section-title {
             font-weight: bold;
             font-size: 14px;
@@ -133,6 +142,13 @@
             grid-template-columns: 1fr 1fr;
             gap: 8px;
             margin-bottom: 10px;
+        }
+
+        .option-grid-single {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+            margin-bottom: 6px;
         }
 
         .option-card {
@@ -162,6 +178,13 @@
 
         .option-card.selected .checkmark {
             display: inline;
+        }
+
+        .setting-note {
+            font-size: 11px;
+            color: gray;
+            margin-bottom: 12px;
+            line-height: 1.4;
         }
 
         .main-container {
@@ -211,6 +234,19 @@
             overflow: hidden;
             color: var(--text-color);
             direction: rtl;
+        }
+
+        .ayah-span {
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+            user-select: none;
+        }
+
+        .ayah-span.playing {
+            background-color: var(--highlight-bg);
+            color: var(--accent-color);
+            font-weight: bold;
         }
 
         .surah-banner {
@@ -350,7 +386,7 @@
 
     <div class="top-header">
         <button class="menu-btn" onclick="toggleSidebar(event)">☰</button>
-        <span class="header-title">تطبيق تبيان</span>
+        <span class="header-title">تبيــان</span>
         <div style="width: 24px;"></div>
     </div>
 
@@ -394,6 +430,21 @@
             <li class="menu-item" onclick="toggleSubMenu('settingsMenu')">⚙️ الإعدادات ▾
                 <ul class="sub-menu" id="settingsMenu">
                     
+                    <!-- القارئ المفضل -->
+                    <div class="setting-section-title">القارئ المفضل</div>
+                    <div class="option-grid-single">
+                        <div class="option-card" id="reciter-ar.yasserdosssre" onclick="selectReciter('ar.yasserdosssre')">
+                            <span>ياسر الدوسري</span><span class="checkmark">✓</span>
+                        </div>
+                        <div class="option-card" id="reciter-ar.ayyoub" onclick="selectReciter('ar.ayyoub')">
+                            <span>محمد أيوب</span><span class="checkmark">✓</span>
+                        </div>
+                        <div class="option-card" id="reciter-ar.mahermuaiqly" onclick="selectReciter('ar.mahermuaiqly')">
+                            <span>ماهر المعيقلي</span><span class="checkmark">✓</span>
+                        </div>
+                    </div>
+                    <div class="setting-note">💡 اضغط ضغطة مطولة على الآية للاستماع إليها.</div>
+
                     <!-- المظهر -->
                     <div class="setting-section-title">المظهر</div>
                     <div class="option-grid">
@@ -493,6 +544,9 @@
         </div>
     </div>
 
+    <!-- مشغل الصوت المخفي -->
+    <audio id="audioPlayer" style="display:none;"></audio>
+
     <script>
         const allAdhkar = {
             morning: [
@@ -523,7 +577,12 @@
         let currentPage = parseInt(localStorage.getItem('saved_page')) || 1;
         let bookmarkedPage = parseInt(localStorage.getItem('bookmarked_page')) || 0;
         let timeFormat = localStorage.getItem('time_format') || '12';
+        let selectedReciter = localStorage.getItem('selected_reciter') || 'ar.yasserdosssre';
         let tasbeehCount = 0;
+        
+        const audioPlayer = document.getElementById('audioPlayer');
+        let currentPlayingSpan = null;
+        let longPressTimer = null;
 
         function cleanSurahName(name) {
             if (!name) return "";
@@ -539,13 +598,14 @@
         function toggleSubMenu(id) { document.getElementById(id).classList.toggle('open'); }
 
         async function loadPage(p) {
+            stopAudio();
             p = Math.max(1, Math.min(604, p));
             currentPage = p;
             document.getElementById('quranText').innerText = "جاري التحميل...";
             document.getElementById('pageInput').value = p;
 
             try {
-                const res = await fetch(`https://api.alquran.cloud/v1/page/${p}/quran-uthmani`);
+                const res = await fetch(`https://api.alquran.cloud/v1/page/${p}/${selectedReciter}`);
                 const data = await res.json();
                 
                 let surahNames = [];
@@ -558,7 +618,9 @@
                         surahNames.push(cleanedName);
                         pageContent += `<div class="surah-banner">سورة ${cleanedName}</div>`;
                     }
-                    pageContent += `${a.text} ﴿${a.numberInSurah}﴾ `;
+                    
+                    let audioUrl = a.audio || "";
+                    pageContent += `<span class="ayah-span" data-audio="${audioUrl}">${a.text} ﴿${a.numberInSurah}﴾ </span>`;
                 });
 
                 if (surahNames.length === 0) {
@@ -570,12 +632,68 @@
                 document.getElementById('footerSurahName').innerText = surahNames.join(' - ');
                 document.getElementById('footerJuz').innerText = `الجزء: ${juzNum}`;
                 
+                attachLongPressEvents();
                 updateBookmarkState();
                 localStorage.setItem('saved_page', p);
                 
                 setTimeout(adjustQuranFontSize, 50);
             } catch (err) {
                 document.getElementById('quranText').innerText = "تعذر تحميل الصفحة. يرجى التأكد من الاتصال بالإنترنت.";
+            }
+        }
+
+        function attachLongPressEvents() {
+            const spans = document.querySelectorAll('.ayah-span');
+            spans.forEach(span => {
+                const startPress = () => {
+                    longPressTimer = setTimeout(() => {
+                        playAyahAudio(span);
+                    }, 500);
+                };
+
+                const cancelPress = () => {
+                    clearTimeout(longPressTimer);
+                };
+
+                span.addEventListener('touchstart', startPress, {passive: true});
+                span.addEventListener('touchend', cancelPress);
+                span.addEventListener('touchmove', cancelPress);
+
+                span.addEventListener('mousedown', startPress);
+                span.addEventListener('mouseup', cancelPress);
+                span.addEventListener('mouseleave', cancelPress);
+            });
+        }
+
+        function playAyahAudio(span) {
+            const audioUrl = span.getAttribute('data-audio');
+            if (!audioUrl) return;
+
+            if (currentPlayingSpan === span && !audioPlayer.paused) {
+                stopAudio();
+                return;
+            }
+
+            stopAudio();
+
+            currentPlayingSpan = span;
+            currentPlayingSpan.classList.add('playing');
+
+            audioPlayer.src = audioUrl;
+            audioPlayer.play();
+
+            audioPlayer.onended = () => {
+                stopAudio();
+            };
+        }
+
+        function stopAudio() {
+            if (!audioPlayer.paused) {
+                audioPlayer.pause();
+            }
+            if (currentPlayingSpan) {
+                currentPlayingSpan.classList.remove('playing');
+                currentPlayingSpan = null;
             }
         }
 
@@ -682,6 +800,14 @@
             showSection('adhkar');
         }
 
+        function selectReciter(val) {
+            document.querySelectorAll('[id^="reciter-"]').forEach(el => el.classList.remove('selected'));
+            document.getElementById(`reciter-${val}`).classList.add('selected');
+            selectedReciter = val;
+            localStorage.setItem('selected_reciter', val);
+            loadPage(currentPage);
+        }
+
         function selectTheme(val) {
             document.querySelectorAll('[id^="theme-"]').forEach(el => el.classList.remove('selected'));
             document.getElementById(`theme-${val}`).classList.add('selected');
@@ -747,6 +873,9 @@
         }
 
         window.onload = () => {
+            const savedReciter = localStorage.getItem('selected_reciter') || 'ar.yasserdosssre';
+            selectReciter(savedReciter);
+
             const savedTheme = localStorage.getItem('app_theme') || 'light';
             selectTheme(savedTheme);
 
