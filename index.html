@@ -29,8 +29,8 @@
     --border-color: #ddd6ca;
     --gold-accent: #c5a059;
 
-    --quran-font-size: 21px;
-    --quran-line-height: 2.18;
+    --quran-font-size: 20px;
+    --quran-line-height: 2.05;
 
     --adhkar-font-size: 18px;
 
@@ -367,7 +367,7 @@ body.reading-mode .main-container {
 }
 
 /* =========================================================
-   صفحة القرآن والخطوط
+   صفحة القرآن والخطوط - تثبيت الشاشة نهائياً
 ========================================================= */
 
 .quran-page {
@@ -375,8 +375,8 @@ body.reading-mode .main-container {
     z-index: 2;
     width: 100%;
     height: 100%;
-    padding: 12px 20px;
-    overflow-y: auto;
+    padding: 16px 18px 22px;
+    overflow: hidden; /* تثبيت الشاشة ومنع التمرير */
     font-family: 'UthmanicHafs', serif;
     font-size: var(--quran-font-size);
     line-height: var(--quran-line-height);
@@ -385,17 +385,33 @@ body.reading-mode .main-container {
     text-align-last: center;
     direction: rtl;
     word-spacing: 0;
-    overflow-wrap: normal;
-    word-break: normal;
     white-space: normal;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
+/* تصغير أرقام الآيات والأقواس */
 .ayah-number {
     color: var(--gold-accent);
     font-family: 'Amiri', 'UthmanicHafs', serif;
     font-weight: bold;
-    padding: 0 2px;
+    font-size: 0.85em;
+    padding: 0 1px;
     display: inline-block;
+}
+
+/* رقم الصفحة في أسفل الإطار */
+.page-footer-number {
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    font-weight: bold;
+    color: var(--gold-accent);
+    z-index: 10;
+    font-family: 'Cairo', sans-serif;
 }
 
 /* =========================================================
@@ -404,12 +420,12 @@ body.reading-mode .main-container {
 
 .surah-banner {
     width: 84%;
-    margin: 5px auto 2px;
-    padding: 5px 18px;
+    margin: 3px auto 1px;
+    padding: 4px 14px;
     text-align: center;
     font-family: 'Andalus', 'Amiri', serif;
-    font-size: 21px;
-    line-height: 1.35;
+    font-size: 20px;
+    line-height: 1.3;
     font-weight: 700;
     color: var(--gold-accent);
     background: linear-gradient(90deg, transparent, rgba(197,160,89,.06), rgba(197,160,89,.18), rgba(197,160,89,.06), transparent);
@@ -423,8 +439,8 @@ body.reading-mode .main-container {
     content: "";
     position: absolute;
     top: 50%;
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
     border: 1.5px solid var(--gold-accent);
     transform: translateY(-50%) rotate(45deg);
 }
@@ -436,10 +452,10 @@ body.reading-mode .main-container {
     width: 100%;
     text-align: center;
     font-family: 'UthmanicHafs', 'Amiri', serif;
-    font-size: 21px;
-    line-height: 1.7;
+    font-size: 19px;
+    line-height: 1.6;
     color: var(--gold-accent);
-    margin: 0 auto 7px;
+    margin: 0 auto 5px;
     direction: rtl;
     white-space: nowrap;
 }
@@ -534,7 +550,6 @@ body.reading-mode .main-container {
     outline: none;
 }
 
-/* الأزرار الذهبية المعدلة */
 .btn-go {
     background: var(--gold-accent);
     color: white;
@@ -749,26 +764,24 @@ body.reading-mode .main-container {
 .overlay.active { display: block; }
 
 /* =========================================================
-   التجاوب
+   التجاوب والضبط التلقائي للحجم لمنع السكرول
 ========================================================= */
 
-@media (max-height: 700px) {
+@media (max-height: 750px) {
     :root {
-        --quran-font-size: 18px;
-        --quran-line-height: 1.95;
+        --quran-font-size: 17px;
+        --quran-line-height: 1.88;
     }
+    .surah-banner { margin: 2px auto 1px; padding: 3px 10px; font-size: 17px; }
+    .bismillah { font-size: 17px; margin-bottom: 4px; }
 }
 
 @media (max-width: 600px) {
     .sidebar { width: 300px; }
     .quran-frame { height: calc(100vh - 110px); }
-    .quran-page {
-        padding: 8px 14px;
-        font-size: 19px;
-        line-height: 2.0;
-    }
-    .surah-banner { width: 84%; font-size: 19px; padding: 5px 14px; }
-    .bismillah { font-size: 20px; margin-bottom: 7px; }
+    .quran-page { padding: 14px 12px 18px; }
+    .surah-banner { width: 84%; font-size: 18px; padding: 4px 12px; }
+    .bismillah { font-size: 18px; margin-bottom: 5px; }
     .page-controls-footer { padding: 0 6px; font-size: 10px; gap: 4px; }
     .surah-info-box { min-width: 82px; max-width: 92px; }
     .btn-last-bookmark { padding: 4px 6px; font-size: 9px; }
@@ -778,7 +791,7 @@ body.reading-mode .main-container {
 }
 
 @media (max-width: 390px) {
-    .quran-page { padding-left: 12px; padding-right: 12px; font-size: 18px; line-height: 1.95; }
+    .quran-page { padding-left: 10px; padding-right: 10px; }
     .page-controls-footer { padding: 0 4px; }
     .btn-last-bookmark { font-size: 8px; padding: 4px 5px; }
     .page-input { width: 43px; }
@@ -850,6 +863,7 @@ body.reading-mode .main-container {
     <section id="quranSection" class="quran-wrapper">
         <div class="quran-frame page-odd" id="quranFrame">
             <div class="quran-page" id="quranText">جاري التحميل...</div>
+            <div class="page-footer-number" id="pageFooterNumber">١</div>
         </div>
 
         <div class="page-controls-footer">
@@ -998,7 +1012,6 @@ function cleanSurahName(name) {
     return name.replace(/سُورَةُ/gi, '').replace(/سورة/gi, '').trim();
 }
 
-/* حذف دقيق للبسملة المكررة */
 function removeBismillah(text) {
     if (!text) return '';
     return text
@@ -1018,6 +1031,7 @@ async function loadPage(page) {
 
     quranText.innerHTML = 'جاري التحميل...';
     document.getElementById('pageInput').value = toArabicDigits(page);
+    document.getElementById('pageFooterNumber').innerText = toArabicDigits(page);
 
     frame.classList.remove('page-odd', 'page-even');
     frame.classList.add(page % 2 === 0 ? 'page-even' : 'page-odd');
@@ -1052,7 +1066,6 @@ async function loadPage(page) {
                 ayahText = removeBismillah(ayahText);
             }
 
-            /* إضافة أرقام الآيات بالأقواس الذهبية */
             pageContent += `${ayahText} <span class="ayah-number">﴿${toArabicDigits(ayah.numberInSurah)}﴾</span> `;
         });
 
@@ -1182,7 +1195,7 @@ async function goToSurah(surahNumber) {
     }
 }
 
-/* حصن المسلم والتحكم بالنجمات والمفضلة */
+/* حصن المسلم والتحكم بالمفضلة */
 async function loadHisnMuslim() {
     try {
         const response = await fetch(HISN_URL);
@@ -1232,7 +1245,6 @@ function loadHisnCategory(title) {
     
     const isCategoryFav = favorites.some(fav => fav.id === createCategoryFavoriteId(title));
 
-    /* زر نجمة ذهبية تفاعلي لحفظ الباب كاملاً في رأس الصفحة */
     document.getElementById('adhkarTitle').innerHTML = `
         <div style="display:flex; align-items:center; justify-content:center; gap:10px;">
             <span>${title}</span>
