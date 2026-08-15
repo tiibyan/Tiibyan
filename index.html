@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>تطبيق تبيــان</title>
-    <!-- استدعاء خط Amiri المخصص للنصوص المشكولة والقرآن الشريف -->
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Aref+Ruqaa:wght@700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- استدعاء خط Amiri Quran المخصص للرسم العثماني لمنع مشاكل التشكيل نهائياً -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Amiri:ital,wght@0,400;0,700&family=Aref+Ruqaa:wght@700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-color: #fcf8f2;
@@ -181,7 +181,7 @@
             position: relative;
         }
 
-        /* --- تصميم الإطار المزدوج للصفحات الفردية والزوجية --- */
+        /* --- الإطارات الأندلسية النحيفة (على اليمين واليسار فقط - بدون إطار فوق وتحت) --- */
         .quran-frame {
             width: 100%;
             max-width: 800px;
@@ -192,33 +192,30 @@
             transition: all 0.2s ease;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            border-top: none !important;
+            border-bottom: none !important;
         }
 
-        /* الصفحة الفردية */
+        /* الصفحة الفردية (كعب المصحف يمين والإطار الأندلسي نحيف يسار) */
         .quran-frame.odd-page {
-            border-right: 12px solid var(--gold-accent);
-            border-left: 2px solid var(--border-color);
-            border-top: 4px double var(--gold-accent);
-            border-bottom: 4px double var(--gold-accent);
-            padding: 10px 20px 10px 10px;
-            border-radius: 4px 12px 12px 4px;
-        }
-
-        /* الصفحة الزوجية */
-        .quran-frame.even-page {
-            border-left: 12px solid var(--gold-accent);
             border-right: 2px solid var(--border-color);
-            border-top: 4px double var(--gold-accent);
-            border-bottom: 4px double var(--gold-accent);
-            padding: 10px 10px 10px 20px;
-            border-radius: 12px 4px 4px 12px;
+            border-left: 5px double var(--gold-accent);
+            padding: 10px 15px;
         }
 
+        /* الصفحة الزوجية (كعب المصحف يسار والإطار الأندلسي نحيف يمين) */
+        .quran-frame.even-page {
+            border-left: 2px solid var(--border-color);
+            border-right: 5px double var(--gold-accent);
+            padding: 10px 15px;
+        }
+
+        /* ضبط خط القرآن لضمان سلامة التشكيل 100% */
         .quran-page {
-            font-family: 'Amiri', serif;
+            font-family: 'Amiri Quran', 'Amiri', serif;
             font-size: var(--quran-font-size);
-            line-height: 2.3;
+            line-height: 2.4;
             text-align: justify;
             text-justify: inter-word;
             width: 100%;
@@ -227,6 +224,7 @@
             color: var(--text-color);
             direction: rtl;
             font-variant-ligatures: normal;
+            font-feature-settings: "kern" 1, "liga" 1;
         }
 
         .ayah-span {
@@ -234,7 +232,7 @@
             border-radius: 4px;
             transition: background-color 0.2s ease, color 0.2s ease;
             user-select: none;
-            padding: 0 2px;
+            padding: 0 1px;
             display: inline;
         }
 
@@ -244,21 +242,32 @@
             font-weight: bold;
         }
 
+        /* --- بنر السورة الأندلسي المصغر والأنيق --- */
         .surah-banner {
-            font-family: 'Cairo', sans-serif;
-            border: 2px solid var(--accent-color);
-            background-color: var(--bg-color);
+            font-family: 'Aref Ruqaa', 'Amiri', serif;
+            border-top: 1px double var(--gold-accent);
+            border-bottom: 1px double var(--gold-accent);
+            background-color: transparent;
             text-align: center;
-            padding: 4px;
-            margin: 8px 0;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 0.85em;
-            color: var(--accent-color);
+            padding: 2px 0;
+            margin: 6px auto;
+            width: 80%;
+            font-size: 0.75em;
+            color: var(--gold-accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .surah-banner::before, .surah-banner::after {
+            content: "❖";
+            font-size: 10px;
+            color: var(--gold-accent);
         }
 
         .andalusian-bookmark {
-            font-size: 26px;
+            font-size: 24px;
             color: var(--text-color);
             cursor: pointer;
             transition: color 0.3s, transform 0.2s;
@@ -613,7 +622,7 @@
             p = Math.max(1, Math.min(604, p));
             currentPage = p;
 
-            // تغيير إطار الصفحة تلقائياً حسب الفردي والزوجي
+            // تعديل اتجاه الإطار النحيف حسب الفردي والزوجي
             const frame = document.getElementById('quranFrame');
             if (p % 2 === 0) {
                 frame.classList.remove('odd-page');
@@ -660,7 +669,6 @@
             }
         }
 
-        /* الاستماع بنقرة واحدة فقط */
         function playAyahAudio(span) {
             const audioUrl = span.getAttribute('data-audio');
             if (!audioUrl) return;
